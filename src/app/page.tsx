@@ -1,15 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useExpenses } from '@/hooks/useExpenses';
 import SummaryCards from '@/components/SummaryCards';
 import MonthlyChart from '@/components/MonthlyChart';
 import CategoryBreakdown from '@/components/CategoryBreakdown';
+import ExportModal from '@/components/ExportModal';
 import { formatCurrency, formatDate, getCurrentMonthKey } from '@/lib/utils';
 import { CATEGORY_BADGE, CATEGORY_ICONS } from '@/types/expense';
 
 export default function DashboardPage() {
   const { expenses, isLoaded } = useExpenses();
+  const [showExport, setShowExport] = useState(false);
 
   if (!isLoaded) {
     return (
@@ -42,13 +45,27 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
           <p className="text-slate-500 text-sm mt-0.5">Track and manage your spending</p>
         </div>
-        <Link
-          href="/add"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          + Add Expense
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={expenses.length === 0}
+            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 transition-colors"
+          >
+            <span className="text-base">↗</span>
+            <span>Export</span>
+          </button>
+          <Link
+            href="/add"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            + Add Expense
+          </Link>
+        </div>
       </div>
+
+      {showExport && (
+        <ExportModal expenses={expenses} onClose={() => setShowExport(false)} />
+      )}
 
       {/* Summary cards */}
       <SummaryCards expenses={expenses} />
