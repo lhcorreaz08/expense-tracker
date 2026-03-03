@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Expense, ExpenseFilters, CATEGORY_BADGE, CATEGORY_ICONS } from '@/types/expense';
+import { Expense, ExpenseFilters } from '@/types/expense';
 import { formatCurrency, formatDate, exportToCSV } from '@/lib/utils';
 import { ExpenseInput } from '@/hooks/useExpenses';
 import FilterBar from './FilterBar';
 import ExpenseForm from './ExpenseForm';
+import CategoryBadge from './CategoryBadge';
 
 interface Props {
   expenses: Expense[];
@@ -140,11 +141,7 @@ export default function ExpenseList({ expenses, onUpdate, onDelete }: Props) {
                       <span className="line-clamp-1">{expense.description}</span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${CATEGORY_BADGE[expense.category]}`}
-                      >
-                        {CATEGORY_ICONS[expense.category]} {expense.category}
-                      </span>
+                      <CategoryBadge category={expense.category} size="md" />
                     </td>
                     <td className="px-5 py-3.5 text-right font-semibold text-slate-800 whitespace-nowrap">
                       {formatCurrency(expense.amount)}
@@ -181,11 +178,7 @@ export default function ExpenseList({ expenses, onUpdate, onDelete }: Props) {
                       {expense.description}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span
-                        className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium border ${CATEGORY_BADGE[expense.category]}`}
-                      >
-                        {CATEGORY_ICONS[expense.category]} {expense.category}
-                      </span>
+                      <CategoryBadge category={expense.category} />
                       <span className="text-xs text-slate-400">{formatDate(expense.date)}</span>
                     </div>
                   </div>
