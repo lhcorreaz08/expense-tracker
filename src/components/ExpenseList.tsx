@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Expense, ExpenseFilters, CATEGORY_BADGE, CATEGORY_ICONS } from '@/types/expense';
 import { formatCurrency, formatDate, exportToCSV } from '@/lib/utils';
 import { ExpenseInput } from '@/hooks/useExpenses';
@@ -32,28 +32,34 @@ export default function ExpenseList({ expenses, onUpdate, onDelete }: Props) {
     setTimeout(() => setToast(null), 2500);
   }
 
-  // Filter + sort
-  const filtered = expenses
-    .filter((e) => {
-      if (filters.category !== 'All' && e.category !== filters.category) return false;
-      if (filters.startDate && e.date < filters.startDate) return false;
-      if (filters.endDate && e.date > filters.endDate) return false;
-      if (filters.search) {
-        const q = filters.search.toLowerCase();
-        if (!e.description.toLowerCase().includes(q) && !e.category.toLowerCase().includes(q))
-          return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      switch (filters.sortBy) {
-        case 'date-asc': return a.date.localeCompare(b.date);
-        case 'date-desc': return b.date.localeCompare(a.date);
-        case 'amount-asc': return a.amount - b.amount;
-        case 'amount-desc': return b.amount - a.amount;
-        default: return 0;
-      }
-    });
+  // Memoised: only recomputes when expenses or filters change,
+  // preventing unnecessary O(n log n) work on unrelated re-renders
+  // (e.g. toast appearing, modal opening/closing).
+  const filtered = useMemo(
+    () =>
+      expenses
+        .filter((e) => {
+          if (filters.category !== 'All' && e.category !== filters.category) return false;
+          if (filters.startDate && e.date < filters.startDate) return false;
+          if (filters.endDate && e.date > filters.endDate) return false;
+          if (filters.search) {
+            const q = filters.search.toLowerCase();
+            if (!e.description.toLowerCase().includes(q) && !e.category.toLowerCase().includes(q))
+              return false;
+          }
+          return true;
+        })
+        .sort((a, b) => {
+          switch (filters.sortBy) {
+            case 'date-asc': return a.date.localeCompare(b.date);
+            case 'date-desc': return b.date.localeCompare(a.date);
+            case 'amount-asc': return a.amount - b.amount;
+            case 'amount-desc': return b.amount - a.amount;
+            default: return 0;
+          }
+        }),
+    [expenses, filters],
+  );
 
   const filteredTotal = filtered.reduce((s, e) => s + e.amount, 0);
 
