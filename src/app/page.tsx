@@ -8,7 +8,7 @@ import MonthlyChart from '@/components/MonthlyChart';
 import CategoryBreakdown from '@/components/CategoryBreakdown';
 import CloudExportHub from '@/components/CloudExportHub';
 import { formatCurrency, formatDate, getCurrentMonthKey } from '@/lib/utils';
-import { CATEGORY_BADGE, CATEGORY_ICONS } from '@/types/expense';
+import CategoryBadge from '@/components/CategoryBadge';
 
 export default function DashboardPage() {
   const { expenses, isLoaded } = useExpenses();
@@ -111,11 +111,7 @@ export default function DashboardPage() {
                     {expense.description}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span
-                      className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium border ${CATEGORY_BADGE[expense.category]}`}
-                    >
-                      {CATEGORY_ICONS[expense.category]} {expense.category}
-                    </span>
+                    <CategoryBadge category={expense.category} />
                     <span className="text-xs text-slate-400">{formatDate(expense.date)}</span>
                   </div>
                 </div>
