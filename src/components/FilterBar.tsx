@@ -1,7 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { ExpenseFilters } from '@/types/expense';
 import { CATEGORIES } from '@/types/expense';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface Props {
   filters: ExpenseFilters;
@@ -12,6 +14,21 @@ interface Props {
 export default function FilterBar({ filters, onChange, onReset }: Props) {
   const inputClass =
     'px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white transition-colors';
+
+  // Local state so the input feels instant while the actual filter is debounced
+  const [searchInput, setSearchInput] = useState(filters.search);
+  const debouncedSearch = useDebounce(searchInput, 300);
+
+  // Propagate debounced value upward only when it changes
+  useEffect(() => {
+    onChange({ ...filters, search: debouncedSearch });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
+  // Keep local input in sync when parent resets filters
+  useEffect(() => {
+    setSearchInput(filters.search);
+  }, [filters.search]);
 
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
@@ -26,8 +43,8 @@ export default function FilterBar({ filters, onChange, onReset }: Props) {
             <input
               type="text"
               placeholder="Search expenses…"
-              value={filters.search}
-              onChange={(e) => onChange({ ...filters, search: e.target.value })}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className={`${inputClass} pl-8 w-full`}
             />
           </div>
@@ -91,7 +108,7 @@ export default function FilterBar({ filters, onChange, onReset }: Props) {
 
         {/* Reset */}
         <button
-          onClick={onReset}
+          onClick={() => { setSearchInput(''); onReset(); }}
           className="px-3 py-2 text-sm text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors border border-transparent"
         >
           Reset
