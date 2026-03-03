@@ -1,0 +1,32 @@
+Feature: error-boundaries
+Branch: feature/error-boundaries
+Worktree: ../expense-tracker-error-boundaries
+Status: COMPLETED
+
+## What was implemented
+Created a reusable React class component ErrorBoundary that catches any
+rendering error from child components and displays a friendly recovery UI
+instead of a blank page. Wrapped the entire app in layout.tsx.
+
+## Files created
+- src/components/ErrorBoundary.tsx (new, 63 lines)
+  - React.Component<Props, State> with getDerivedStateFromError
+  - Props: children (required), fallback (optional override ReactNode)
+  - Default error UI: warning icon, message, "Try again" button, collapsible error details
+  - Tailwind styling consistent with rest of app (white card, slate text, indigo button)
+  - "Try again" resets state via handleReset, allowing recovery without full reload
+
+## Files modified
+- src/app/layout.tsx
+  Line 4:  added import for ErrorBoundary
+  Line 15: wrapped {children} with <ErrorBoundary>
+
+## TypeScript compilation
+No errors in modified/created files.
+
+## Integration notes
+- Merge target: main or any branch
+- ErrorBoundary is a class component — this is required by React (no hook equivalent for error catching)
+- The 'use client' directive is required because it uses class component state
+- Next.js 14 App Router compatible: layout.tsx wraps all pages so every route is protected
+- Optional `fallback` prop allows per-page custom error screens if needed

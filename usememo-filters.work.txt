@@ -1,0 +1,34 @@
+Feature: usememo-filters
+Branch: feature/usememo-filters
+Worktree: ../expense-tracker-usememo-filters
+Status: COMPLETED
+
+## What was implemented
+Wrapped the filter+sort computation in ExpenseList inside useMemo so it only
+recalculates when `expenses` or `filters` change. Previously it ran on every
+render, including unrelated state changes (toast appearing, modal open/close).
+
+## Files modified
+- src/components/ExpenseList.tsx
+  Line 3:  added `useMemo` to React import
+  Lines 35-57: wrapped `filtered` chain in useMemo(() => ..., [expenses, filters])
+
+## Diff summary
+  import { useState } from 'react';
+→ import { useState, useMemo } from 'react';
+
+  // Filter + sort
+  const filtered = expenses.filter(...).sort(...);
+→ // Memoised: only recomputes when expenses or filters change
+  const filtered = useMemo(() => expenses.filter(...).sort(...), [expenses, filters]);
+
+## TypeScript compilation
+No errors in modified files (pre-existing errors are from absent node_modules
+in worktree — not related to this change).
+
+## Integration notes
+- Merge target: main or feature-data-export-v3
+- Zero behavioural change — pure performance improvement
+- Dependency array [expenses, filters] is complete and correct
+- If useMemo is later removed (e.g. React Compiler auto-memoises),
+  the behaviour remains identical

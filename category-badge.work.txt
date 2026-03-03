@@ -1,0 +1,38 @@
+Feature: category-badge
+Branch: feature/category-badge
+Worktree: ../expense-tracker-category-badge
+Status: COMPLETED
+
+## What was implemented
+Extracted the inline category pill JSX (duplicated in 3 places) into a
+reusable CategoryBadge component. Pure refactor — zero visual change.
+
+## Files created
+- src/components/CategoryBadge.tsx (new, 17 lines)
+  - Props: category (Category), size ('sm' | 'md', default 'sm')
+  - sm = gap-0.5 px-2 (mobile & dashboard style)
+  - md = gap-1 px-2.5 (desktop table style)
+  - Uses CATEGORY_BADGE and CATEGORY_ICONS from @/types/expense
+
+## Files modified
+- src/components/ExpenseList.tsx
+  Line 4:  removed CATEGORY_BADGE, CATEGORY_ICONS from import; added CategoryBadge import
+  Line 138-142: replaced desktop inline badge with <CategoryBadge category={expense.category} size="md" />
+  Line 179-183: replaced mobile inline badge with <CategoryBadge category={expense.category} />
+
+- src/app/page.tsx
+  Line 11: replaced CATEGORY_BADGE/CATEGORY_ICONS import with CategoryBadge import
+  Line 114-118: replaced dashboard inline badge with <CategoryBadge category={expense.category} />
+
+## TypeScript compilation
+No errors in modified/created files.
+
+## Dependencies added
+None.
+
+## Integration notes
+- Merge target: main or any branch
+- If more badge usages exist in CloudExportHub or other components, replace those too
+- The size prop handles the one visual difference between contexts (desktop vs mobile/dashboard)
+- CATEGORY_BADGE and CATEGORY_ICONS can be removed from page.tsx imports entirely
+  (already done) without affecting other code since they're still exported from types/expense.ts

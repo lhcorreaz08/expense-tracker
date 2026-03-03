@@ -1,0 +1,41 @@
+Feature: search-debounce
+Branch: feature/search-debounce
+Worktree: ../expense-tracker-search-debounce
+Status: COMPLETED
+
+## What was implemented
+Added 300ms debounce to the search input in FilterBar. The input still feels
+instant (local state updates immediately) but only propagates changes to the
+parent filter state after 300ms of no typing — preventing a full O(n) re-filter
+on every keystroke.
+
+## Files created
+- src/hooks/useDebounce.ts (new, 13 lines)
+  - Generic hook: useDebounce<T>(value: T, delay: number): T
+  - Uses useState + useEffect with setTimeout cleanup
+  - Clears previous timer on each value change (correct debounce semantics)
+
+## Files modified
+- src/components/FilterBar.tsx
+  - Added imports: useState, useEffect, useDebounce
+  - Added local `searchInput` state (tracks raw input instantly for UI responsiveness)
+  - Added `debouncedSearch = useDebounce(searchInput, 300)`
+  - useEffect propagates debouncedSearch upward via onChange when it changes
+  - Second useEffect syncs local searchInput when parent resets filters (filters.search changes)
+  - Reset button now also clears searchInput to '' directly
+  - input value bound to `searchInput` (instant) not filters.search (debounced)
+
+## TypeScript compilation
+No errors in modified/created files.
+
+## Dependencies added
+None — uses only React built-in hooks.
+
+## Integration notes
+- Merge target: main or any branch
+- The eslint-disable comment on the onChange dependency in useEffect is intentional:
+  including `onChange` in deps would cause an infinite loop if the parent doesn't
+  memoize the callback. This is a known React pattern.
+- Delay is hardcoded at 300ms — can be made configurable via prop if needed
+- The second useEffect (sync on filters.search) handles the edge case where the parent
+  resets filters externally (e.g. Reset button) so local searchInput stays in sync
