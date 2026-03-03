@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navigation from '@/components/Navigation';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'ExpenseTracker – Manage your finances',
@@ -12,7 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="bg-slate-50 min-h-screen">
         <Navigation />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</main>
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </main>
       </body>
     </html>
   );
